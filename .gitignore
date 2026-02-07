@@ -1,0 +1,49 @@
+# === Compilação e Build ===
+build/                  # Pasta principal de build (CMake)
+bin/                    # Binários gerados
+obj/                    # Arquivos objeto
+*.o
+*.a
+*.so
+*.out
+*.exe
+
+# === CMake ===
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+_deps/                  # Dependências baixadas pelo FetchContent (ex: GoogleTest)
+
+# === Logs e Dados de Teste ===
+*.log
+test_results/
+coverage/               # Relatórios de cobertura de código
+*.gcda
+*.gcno
+*.info
+
+# === Hardware & Embarcados (ESP32/PlatformIO) ===
+.pio/                   # Pastas do PlatformIO
+.espressif/             # Ferramentas do ESP-IDF
+sdkconfig
+sdkconfig.old
+
+# === IDEs e Editores ===
+.vscode/                # Configurações do VS Code (opcional: manter launch.json se quiser)
+!.vscode/settings.json  # Mantém configurações de projeto se necessário
+.idea/                  # CLion / IntelliJ
+*.swp
+*.swo
+*~
+.DS_Store               # Arquivos de sistema do macOS
+
+# === Arquivos do Projeto (Simulação) ===
+# Se você colocar imagens de teste para o MockCamera, 
+# ignore as imagens de saída processadas, mas mantenha as de entrada.
+output_*.jpg
+output_*.png
+*.json_backup
