@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>  // <--- ESSA LINHA É OBRIGATÓRIA
 #include "EdgeProcessor.h"
+#include "../src/Core/PacketBuilder.h"
 #include <iostream>
 
 TEST(EdgeProcessing, DetectsLineCrack) {
@@ -23,4 +24,30 @@ TEST(EdgeProcessing, DetectsLineCrack) {
     
     EXPECT_GT(result.edge_density, 0.0); 
     EXPECT_LT(result.edge_density, 0.1); 
+}
+
+
+TEST(SystemIntegration, GeneratesValidJSON) {
+    // 1. DADOS MOCKADOS (Simulando hardware)
+    SensorData fakeSensors;
+    fakeSensors.imu = {0.1f, 0.05f, 9.8f, 0.0f, 0.0f, 0.0f}; // Acelerômetro quase parado
+    fakeSensors.distance_mm = 450.0f;
+    fakeSensors.light_lux = 300.0f;
+
+    AnalysisResult fakeAnalysis;
+    fakeAnalysis.edge_density = 0.1234f;
+    fakeAnalysis.confidence = 0.85f;
+    fakeAnalysis.process_time_ms = 150;
+
+    // 2. EXECUÇÃO
+    std::string json = PacketBuilder::build("ESP32-TEST-01", fakeSensors, fakeAnalysis);
+
+    // 3. VALIDAÇÃO (O relatório exige formato correto)
+    std::cout << "\n[JSON OUTPUT PREVIEW]\n" << json << "\n------------------\n";
+
+    // Verifica se as chaves obrigatórias estão presentes
+    EXPECT_NE(json.find("\"device_id\": \"ESP32-TEST-01\""), std::string::npos);
+    EXPECT_NE(json.find("\"distance_mm\": 450"), std::string::npos);
+    EXPECT_NE(json.find("\"edge_density\": 0.1234"), std::string::npos);
+    EXPECT_NE(json.find("\"algorithm\": \"sobel_v1\""), std::string::npos);
 }
