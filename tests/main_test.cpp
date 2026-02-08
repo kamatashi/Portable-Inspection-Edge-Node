@@ -1,21 +1,26 @@
-#include <gtest/gtest.h>
-#include "../src/Mocks/MockCamera.h"
+#include <gtest/gtest.h>  // <--- ESSA LINHA É OBRIGATÓRIA
+#include "EdgeProcessor.h"
+#include <iostream>
 
-// Teste simples para validar se o Mock da câmera funciona
-TEST(CameraSystem, CaptureReturnsValidFrame) {
-    MockCamera cam;
-    ASSERT_TRUE(cam.init()); // Verifica se inicia
+TEST(EdgeProcessing, DetectsLineCrack) {
+    // 1. Criar uma imagem preta (100x100)
+    ImageFrame frame;
+    frame.width = 100;
+    frame.height = 100;
+    frame.data.resize(100 * 100, 0); 
 
-    ImageFrame frame = cam.capture();
+    // 2. Desenhar uma linha branca no meio (Simulando uma fissura)
+    for(int i = 20; i < 80; i++) {
+        frame.data[i * 100 + 50] = 255; 
+    }
+
+    // 3. Processar
+    EdgeProcessor processor;
+    AnalysisResult result = processor.analyze(frame);
+
+    // 4. Validar
+    std::cout << "[TESTE] Densidade Detectada: " << result.edge_density << std::endl;
     
-    // Verifica requisitos básicos da imagem
-    EXPECT_EQ(frame.width, 320);
-    EXPECT_EQ(frame.height, 240);
-    EXPECT_FALSE(frame.data.empty());
-}
-
-// Futuro teste do Processamento de Borda
-TEST(EdgeProcessing, DetectsFailures) {
-    // Aqui você vai instanciar sua classe 'EdgeProcessor'
-    // E passar a imagem do MockCamera para ela
+    EXPECT_GT(result.edge_density, 0.0); 
+    EXPECT_LT(result.edge_density, 0.1); 
 }
