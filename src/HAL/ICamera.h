@@ -7,7 +7,7 @@ struct ImageFrame {
     std::vector<uint8_t> data;
     int width;
     int height;
-    bool valid;
+    bool valid = false;
 };
 
 // Interface da Câmera
