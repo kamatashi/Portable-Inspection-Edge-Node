@@ -2,6 +2,8 @@
 #include "EdgeProcessor.h"
 #include "../src/Core/PacketBuilder.h"
 #include <iostream>
+#include "../src/Core/SerialProtocol.h"
+
 
 TEST(EdgeProcessing, DetectsLineCrack) {
     // 1. Criar uma imagem preta (100x100)
@@ -50,4 +52,34 @@ TEST(SystemIntegration, GeneratesValidJSON) {
     EXPECT_NE(json.find("\"distance_mm\": 450"), std::string::npos);
     EXPECT_NE(json.find("\"edge_density\": 0.1234"), std::string::npos);
     EXPECT_NE(json.find("\"algorithm\": \"sobel_v1\""), std::string::npos);
+}
+
+TEST(Communication, CreatesValidSerialFrame) {
+    // 1. Dados de teste (Um pedaço de JSON)
+    std::string jsonPayload = "{\"id\":123,\"status\":\"ok\"}";
+    
+    // 2. Criar o pacote (Frame)
+    std::vector<uint8_t> packet = SerialProtocol::pack(jsonPayload);
+
+    // 3. Validações Básicas
+    EXPECT_EQ(packet[0], 0xAA); // Tem de ter o Start Byte
+    // Tamanho esperado: 1 (Start) + 2 (Len) + 25 (Payload) + 2 (CRC) = 30 bytes
+    EXPECT_EQ(packet.size(), 1 + 2 + jsonPayload.size() + 2);
+
+    // 4. Validar integridade
+    EXPECT_TRUE(SerialProtocol::validate(packet));
+}
+
+TEST(Communication, DetectsCorruptedData) {
+    std::string jsonPayload = "{\"dado_importante\": 1000}";
+    std::vector<uint8_t> packet = SerialProtocol::pack(jsonPayload);
+
+    // SIMULAÇÃO DE ERRO: Um bit inverteu no cabo (Ruído)
+    // Vamos alterar o byte onde está o número '1'
+    packet[10] = '9'; 
+
+    // O validador deve perceber que o CRC não bate mais com o Payload
+    bool isValid = SerialProtocol::validate(packet);
+    
+    EXPECT_FALSE(isValid); // O teste passa se a função retornar FALSE (rejeitar o pacote)
 }
