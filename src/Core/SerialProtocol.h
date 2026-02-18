@@ -6,18 +6,14 @@
 
 class SerialProtocol {
 public:
-    // MUDANÇA AQUI: de 'const' para 'constexpr'
     static constexpr uint8_t START_BYTE = 0xAA; 
 
-    // Empacota uma string (JSON) num vetor de bytes
     static std::vector<uint8_t> pack(const std::string& payload) {
         std::vector<uint8_t> frame;
         
-        // 1. Cabeçalho
-        frame.push_back(START_BYTE); // Agora isso vai funcionar!
+        frame.push_back(START_BYTE);
         uint16_t length = static_cast<uint16_t>(payload.size());
         
-        // ... (o resto do código continua igual)
         frame.push_back((length >> 8) & 0xFF); 
         frame.push_back(length & 0xFF);        
 
@@ -32,11 +28,10 @@ public:
         return frame;
     }
 
-    // ... (Mantenha o resto das funções validate e calculateCRC16 iguais) ...
     
     static bool validate(const std::vector<uint8_t>& frame) {
         if (frame.size() < 5) return false;
-        if (frame[0] != START_BYTE) return false; // Validação
+        if (frame[0] != START_BYTE) return false;
 
         uint16_t len = (frame[1] << 8) | frame[2];
         if (frame.size() != (size_t)(len + 5)) return false;

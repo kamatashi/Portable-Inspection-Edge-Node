@@ -1,9 +1,8 @@
 #pragma once
 #include "ICamera.h"
-#include "esp_camera.h" // Biblioteca nativa do ESP32
-#include <Arduino.h>    // Necessário para Serial.println no ESP32
+#include "esp_camera.h"
+#include <Arduino.h>
 
-// Definição dos Pinos para o modelo AI-THINKER (Padrão de mercado)
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
 #define XCLK_GPIO_NUM      0
@@ -44,30 +43,27 @@ public:
         config.pin_pwdn = PWDN_GPIO_NUM;
         config.pin_reset = RESET_GPIO_NUM;
         config.xclk_freq_hz = 20000000;
-        config.pixel_format = PIXFORMAT_GRAYSCALE; // Já pegamos em cinza para economizar processamento!
+        config.pixel_format = PIXFORMAT_GRAYSCALE;
         
-        // Se tiver PSRAM, usamos alta resolução, senão, baixa.
         if(psramFound()){
-            config.frame_size = FRAMESIZE_UXGA; // 1600x1200
+            config.frame_size = FRAMESIZE_UXGA;
             config.jpeg_quality = 10;
             config.fb_count = 2;
         } else {
-            config.frame_size = FRAMESIZE_QVGA; // 320x240
+            config.frame_size = FRAMESIZE_QVGA;
             config.jpeg_quality = 12;
             config.fb_count = 1;
         }
 
-        // Inicializa a câmera
         esp_err_t err = esp_camera_init(&config);
         if (err != ESP_OK) {
             Serial.printf("Camera init failed with error 0x%x", err);
             return false;
         }
 
-        // Ajuste fino do sensor para detectar melhor as fissuras
         sensor_t * s = esp_camera_sensor_get();
-        s->set_brightness(s, 1);  // Aumenta brilho levemente
-        s->set_contrast(s, 1);    // Aumenta contraste (ajuda no Sobel)
+        s->set_brightness(s, 1);
+        s->set_contrast(s, 1);
         
         return true;
     }
@@ -82,25 +78,17 @@ public:
             return frame;
         }
 
-        // Converte o buffer do ESP32 para a nossa estrutura ImageFrame
         frame.width = fb->width;
         frame.height = fb->height;
         frame.valid = true;
-        
-        // Aqui está o segredo da performance: 
-        // Em vez de copiar pixel por pixel, poderíamos usar ponteiros,
-        // mas para garantir segurança, copiamos para o nosso vetor.
-        // Como o formato já é GRAYSCALE (definido no init), é byte a byte.
         frame.data.assign(fb->buf, fb->buf + fb->len);
         
-        // Devolve o buffer para o driver imediatamente para liberar para a próxima foto
         esp_camera_fb_return(fb); 
         
         return frame;
     }
 
     void returnFrame(ImageFrame& frame) override {
-        // Limpa nosso vetor local
         frame.data.clear();
         frame.valid = false;
     }
