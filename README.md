@@ -1,7 +1,24 @@
-## Como rodar
+# Portable Inspection Edge Node
+
+## Sumário
+- Objetivo
+- Requisitos
+- Como compilar e executar (SimulateSystem)
+- Estrutura do repositório
+- Evidências
+- Contato
+
+## Como compilar e executar (Linux)
+Pré-requisitos:
+- g++ com suporte a C++17
+- cmake
+- make
+
+Passos:
 ```bash
-cd build
+git clone https://github.com/kamatashi/Portable-Inspection-Edge-Node.git
+cd Portable-Inspection-Edge-Node
+mkdir -p build && cd build
 cmake ..
 make
 ./SimulateSystem
-```
