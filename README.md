@@ -3,5 +3,5 @@
 cd build
 cmake ..
 make
-./RunTests
+./SimulateSystem
 ```
