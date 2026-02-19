@@ -3,9 +3,8 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
-#include "EdgeProcessor.h" // Para ter acesso ao AnalysisResult
+#include "EdgeProcessor.h"
 
-// Estruturas de dados dos sensores (conforme PDF pág. 1 e 4)
 struct IMUData {
     float ax, ay, az;
     float gx, gy, gz;
@@ -19,7 +18,6 @@ struct SensorData {
 
 class PacketBuilder {
 public:
-    // Monta o JSON final
     static std::string build(const std::string& deviceId, 
                              const SensorData& sensors, 
                              const AnalysisResult& analysis) {
@@ -28,17 +26,11 @@ public:
         ss << "{\n";
         ss << "  \"device_id\": \"" << deviceId << "\",\n";
         ss << "  \"timestamp\": \"" << getISOTimestamp() << "\",\n";
-        
-        // Objeto IMU
         ss << "  \"imu\": {\n";
         ss << "    \"ax\": " << sensors.imu.ax << ", \"ay\": " << sensors.imu.ay << ", \"az\": " << sensors.imu.az << "\n";
         ss << "  },\n";
-        
-        // Sensores simples
         ss << "  \"distance_mm\": " << sensors.distance_mm << ",\n";
         ss << "  \"light_lux\": " << sensors.light_lux << ",\n";
-        
-        // Resultado da Análise (Seu Sobel!)
         ss << "  \"analysis\": {\n";
         ss << "    \"edge_density\": " << std::fixed << std::setprecision(4) << analysis.edge_density << ",\n";
         ss << "    \"confidence\": " << analysis.confidence << ",\n";
@@ -51,7 +43,6 @@ public:
     }
 
 private:
-    // Gera data/hora atual no formato ISO8601 (ex: 2026-02-10T14:35:20Z)
     static std::string getISOTimestamp() {
         std::time_t now = std::time(nullptr);
         char buf[25];

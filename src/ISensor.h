@@ -1,18 +1,16 @@
 #pragma once
 
-// Interface Genérica para sensores simples (Luz, Distância)
 class ISensor {
 public:
     virtual ~ISensor() = default;
-    virtual float readValue() = 0; // Retorna Lux ou mm
+    virtual float readValue() = 0;
 };
 
 struct IMUData {
-    float ax, ay, az; // Aceleração
-    float gx, gy, gz; // Giroscópio
+    float ax, ay, az;
+    float gx, gy, gz;
 };
 
-// Interface específica para o IMU
 class IIMU {
 public:
     virtual ~IIMU() = default;
